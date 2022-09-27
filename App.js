@@ -43,6 +43,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     margin: 5,
     marginLeft: 10,
+    marginRight: 10,
     alignItems: 'stretch',
   },
   subtitle_text: {
@@ -50,16 +51,18 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontStyle: 'bold',
     marginBottom: 8,
-    marginTop: 3,
+    marginTop: 2,
     marginLeft: 10,
+    marginRight: 10,
   },
   asset_text: {
-    width: 115,
+    width: 105,
     fontSize: 17,
     fontStyle: 'bold',
     marginBottom: 8,
     marginTop: 3,
     marginLeft: 10,
+    marginRight: 10,
   },
   button_text: {
     color: '#000000',
@@ -69,7 +72,7 @@ const styles = StyleSheet.create({
     margin: 7,
   },
   button: {
-    width: 70,
+    width: 65,
     height: 30,
     alignItems: 'flex-start',
     borderRadius: 5,
@@ -78,15 +81,16 @@ const styles = StyleSheet.create({
   },
   input: {
     alignSelf: "stretch",
-    borderWidth: 2,
+    height: 45,
+    borderWidth: 1,
     borderColor: '#555',
     borderRadius: 5,
     backgroundColor: '#ffffff',
     textAlign: 'flex-start',
-    fontSize: 20,
-    marginBottom: 10,
-    marginTop: 3,
+    fontSize: 15,
+    marginBottom: 30,
     marginLeft: 10,
+    marginRight: 10,
   },
   dropdown: {
     alignSelf: "stretch",
@@ -150,6 +154,7 @@ export default function App() {
     });
   };
 
+
   const assetName = {
     "Bitcoin": "BTC",
     "Ethereum": "ETH",
@@ -180,8 +185,8 @@ export default function App() {
 
 
   useEffect(() => {
-    createTable();
     getPrice();
+    createTable();
 
   }, []);
 
@@ -215,18 +220,16 @@ export default function App() {
   }
 
   const setData = async () => {
-    if (quantity == 0 || price == 0) {
+    getPrice();
+    if (quantity == "" || price == "") {
       Alert.alert('Warning!', 'Please write your data.')
-    }
-    else if (isNaN(price) || isNaN(quantity)) {
-      Alert.alert('Warning!', 'Please enter numeric price and quantity.')
     }
     else if (asset.length == 0) {
       Alert.alert('Warning!', 'Please select an asset.')
     }
     else {
       try {
-        Alert.alert('Confirmed!', 'Add new Asset "' + asset + '" with quantity of ' + quantity + " at price $" + price);
+        Alert.alert('Confirmed!', 'Add new asset "' + asset + '" with quantity of ' + quantity + " at price $" + price + " to the portfolio");
         await db.transaction(async (tx) => {
           await tx.executeSql(
             "INSERT INTO Portfolio (Asset, Quantity, Price) VALUES (?,?,?)",
@@ -288,21 +291,19 @@ export default function App() {
               {
                 assetItems_lst.map((object) => {
                   return (
-                    <View>
+                    <View key={object.name}>
                       <View style={{
                         flexDirection: 'row', alignSelf: "stretch",
                         alignItems: 'stretch', flex: 1
-                      }} key={object.name}>
-
+                      }} >
                         <Text style={styles.asset_text}>{object.name}</Text>
                         <Text style={styles.asset_text}>{object.asset_price}</Text>
                         <Text style={styles.asset_text}>${balance}</Text>
                       </View>
 
-                      <View style={{ flexDirection: 'row' }}>
+                      <View style={{ flexDirection: 'row' }} >
                         <Text style={styles.assetAbbrText}>{assetName[object.name]}</Text>
                         <Text style={styles.assetHoldingAbbrText}>{object.asset_quantity + " " + object.name}</Text>
-
                       </View>
                     </View>
                   )
@@ -339,10 +340,10 @@ export default function App() {
                 dropDownDirection="TOP"
                 style={{
                   backgroundColor: '#fafafa', borderColor: "#B7B7B7",
-                  height: 10, fontsize: 20, justifyContent: "center", alignItems: 'center',
+                  height: 6, fontsize: 10, justifyContent: "center", alignItems: 'center', marginTop: 15
                 }}
                 placeholder="Select an Asset"
-                containerStyle={{ height: 10, width: 200, justifyContent: 'center', }}
+                containerStyle={{ height: 6, width: 355, justifyContent: 'center' }}
                 placeholderstyle={styles.input}
 
                 onChangeItem={(item) => setAsset(item.value)}
@@ -354,7 +355,7 @@ export default function App() {
             <TextInput
               value={quantity ? quantity : ""}
               style={styles.input}
-              placeholder='Enter the Asset Quantity '
+              placeholder='  Enter the Asset Quantity '
               onChangeText={(value) => setQuantity(parseInt(value))}
             />
           </View>
@@ -363,7 +364,7 @@ export default function App() {
             <TextInput
               value={price ? price : ""}
               style={styles.input}
-              placeholder='Enter the Asset Price '
+              placeholder='  Enter the Asset Price '
               onChangeText={(value) => setPrice(parseInt(value))}
             />
           </View>
